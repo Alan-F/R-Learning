@@ -1,0 +1,214 @@
+#is.na()
+a=0/0
+b=NA
+c=c(a,b)
+is.na(c)
+
+#paste()
+d1=letters
+d2=LETTERS
+d3=month.abb
+d4=month.name
+d5=pi
+d=paste(d1,d2,sep='^')
+
+
+#time
+Sys.time()
+Sys.time()-2
+Sys.Date()
+Sys.Date()-1
+system.time()#函数运行时间
+proc.time()#proc.time() 可以获得R 进程存在的时间，system.time() 通过调用两次proc.time()来计算函数运行的时间
+x <- rnorm(1e7)
+system.time(x1 <- sort(x, method = "shell"))
+system.time(x2 <- sort(x, method = "quick"))
+
+#attributes()
+attributes(d)
+
+#sort()/order()/ordered()
+e=c(seq(1,-10,by=-2),seq(1,3,length=3),rep(c(1,2,3),each=2),rep((1:4),times=2));e
+sort(e,dec=T)
+order(e)
+ordered(e)
+print(e)
+
+#tapply
+tapply(vector,factor,function)---tapply(X,Index,FUN)
+f=c(sample(1:50,10))
+f=as.vector(f)
+g=as.factor(c(rep(sample(LETTERS,5),times=2)))
+tapply(f,g,median)
+
+#dim
+z=c(sample(1:50,20))
+dim(z)=c(2,2,5)
+is.array(z)
+is.vector(z)
+attributes(z)
+
+#array
+h=array(1:20,dim=c(4,5))
+i=array(c(1:3,2:4),dim=c(3,2))
+h[i]
+
+#outer / %o%
+j=c(1:3)
+k=c(1:4)
+j%o%k
+outer(j,k,paste)
+l=table(outer(j,k,"+"))
+plot(as.numeric(names(l)),l,type='h',xlab='Determinant',ylab='Frequency')
+
+#aperm 交换坐标 特殊情况t()
+m=array(1:24,dim=c(2,3,4))
+n=aperm(m,c(3,2,1))
+m[1,2,3];n[3,2,1]
+m[2,1,4];n[4,1,2]
+
+#solve(A)/solve(A,b)
+
+#eigen
+o=matrix(sample(1:50,16),4,4)
+eigen(o)
+eigen(o)$val
+eigen(o)$vec
+
+#svm(Single Value Decomposition)  进一步研究
+svd(o)
+
+#lsfit (Least Squares Fit)
+
+#qr 进一步研究
+qr(o)
+
+#cut
+cut()
+
+#hist/density/rug
+p=c(sample(1:1000,50,replace=T))
+p
+hist(p)
+hist(p,seq(0,1000,100),prob=T) #the second arguement is breaks or can be nclass=n
+lines(density(p,bw='nrd0',adjust=1.2)) 
+#About density()---http://www.lifelaf.com/blog/?p=723
+rug(p) #show the actual data points
+
+#ecdf
+plot(ecdf(p),do.point=F,verticals=T)
+q=seq(min(p),max(p),length=50)
+lines(q,pnorm(q,mean=mean(p),sd=sd(p)),col=3)
+
+#ABOUT qqplot
+#总的来说都是比较现有未知分布的一维数据与已存在的分布或另一组未知分布的数据是否相同。主要的方法有：
+#1.观察pdf：即通过hist(),density(),KDE核密度估计,画出现有数据的pdf与假设分布进行比较。
+#2.观察cdf：即使用ecdf()。
+#3.qqplot:从quantile角度来看，若图像呈现y=x线性则同分布。qqnorm为特殊情况
+#4.Shapiro-Wilk test：shapiro.test()只针对正态分布,但不需要具体参数值。
+#5.ks.test：需要具体参数值，可对两组未知数据检验是否同分布。
+par(pty='s') # arrange for a square figure region
+qqnorm(p)#只适用数据是否符合正态分布鉴定
+qqline(p)
+
+r=rexp(5,3);r2=rnorm(500)#r2为要探索其分布是否为e指数分布的数据，r为满足exp分布的数据
+layout(matrix(c(1,2),1,2,byrow=T))
+layout.show(2)
+hist(r,seq(min(r),max(r),length=100),prob=T);lines(density(r,bw='SJ'),col='red')
+hist(r2,seq(min(r2),max(r2),length=100),prob=T);lines(density(r2,bw='SJ'),col='red')
+
+layout(matrix(c(1),1,1))
+r3=seq(min(r2),max(r2),length=500)
+plot(ecdf(r2),do.point=F,verticals=F)
+lines(r3,pt(r3,df=3),col=2)
+
+r4=rexp(500,3)
+qqplot(r,r2)
+
+shapiro.test(r)
+
+ks.test(r, "pnorm", mean = mean(r), sd = sqrt(var(r)))
+
+#Testify distributions of two samples
+s=c(79.98, 80.04, 80.02, 80.04, 80.03,80.03,80.04,79.97,80.05, 80.03, 80.02,80.00,80.02)
+t=c(80.02, 79.94, 79.98, 79.97, 79.97, 80.03, 79.95, 79.97)
+boxplot(s,t)
+#
+#All these tests assume normality of the two samples
+#unpaired t-test->the equality of the means
+t.test(s,t)
+#F test->equality in the variances
+var.test(s,t)
+#classical t-test
+t.test(s, t, var.equal=TRUE)
+#
+#Do not assume normality
+#Wilcoxon (or Mann-Whitney) test<-only assumes a common continuous distribution under the null hypothesis
+wilcox.test(s,t)
+#
+plot(ecdf(s), do.points=FALSE, verticals=TRUE, xlim=range(s, t))
+plot(ecdf(t), do.points=FALSE, verticals=TRUE, add=TRUE)
+ks.test(s,t)
+
+#About &和&&
+#对于vector：u=c(1,2,3,4,5);which(u>1&u<3);which(u>1&&u<3)
+#对于多值判断：&&遇到False即返回False，节省时间
+
+#split--弱化版的tapply()
+n <- 10; nn <- 100
+g <- factor(round(n * runif(n * nn)))
+x <- rnorm(n * nn) + sqrt(as.numeric(g))
+g
+x
+xg <- split(x, g)
+xg
+
+#define a binary operations
+#"%!%"<-function(x,y)
+
+#nonlinear regression model
+#glm()--family=gaussian/binomial/poisson/quasi
+#nlm()/nls()
+
+#coplot
+windows(2)
+u=sample(1:10,30,replace=T)
+u2=sample(1:100,30,replace=T)
+u3=u2=sample(1:1000,30,replace=T)
+v=as.factor(c(rep(1:5,each=6)))
+split(u,v)
+coplot(u~u2|v,type='s')
+plot(1:5,1:5,type='S')
+
+#dotchart
+dotchart(sort(u2),sort(u))
+
+#plot 3 variables
+image(1:30,1:30,outer(u3,u,"/"))#the 1st and 2nd arguements are sequential;the third must be matrix
+contour(1:30,2:31,outer(u3,u2,"+"))
+persp(1:30,2:31,outer(u3,u2,"+"))
+
+#text
+data(iris)
+View(iris)
+tapply(iris$Sepal.Length,iris$Species,mean)
+plot(iris[,1],iris[,2],type='S')
+plot(iris[,1],iris[,2],type='h',col=as.numeric(iris[,5]))
+plot(iris[,1],iris[,2],type='p',col=as.numeric(iris[,5]))
+plot(iris[,1],iris[,2],type='n');text(iris[,1],iris[,2],abbreviate(iris[,5]))
+
+#legend
+legend(locator(),legend=levels(iris[,5]))
+
+#locator()/identify()
+identify(iris[,1],iris[,2],labels=iris[,5])
+
+#par()
+par(c('lwd','col'))
+par(lwd=1,col="black")
+par(mfcol=c(3,2))
+par(mfrow=c(1,1))
+
+#weighted regression
+#other nonlinear regression and nonparamatic regression
+
